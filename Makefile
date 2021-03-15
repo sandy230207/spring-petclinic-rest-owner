@@ -6,7 +6,7 @@ db-build:
 		-t $(db_name) .
 
 db-run:
-	docker run --rm \
+	docker run -d --rm \
 		--name=mysql-petclinic-owner \
 		-h localhost \
 		-p 3306:3306 \
