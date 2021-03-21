@@ -1,9 +1,11 @@
-db_name = "sandy230207/mysql-petclinic-owner:v1"
+DB_NAME = "mysql-petclinic-owner"
+OWNER_SERVER_NAME = "spring-petclinic-rest-owner"
+
 
 db-build:
 	docker build \
-		-f ./src/main/resources/db/Dockerfile \
-		-t $(db_name) .
+		-f docker/db.Dockerfile \
+		-t $(DB_NAME) .
 
 db-run:
 	docker run -d --rm \
@@ -12,10 +14,20 @@ db-run:
 		-p 3306:3306 \
 		-e MYSQL_ROOT_PASSWORD=petclinic \
 		-e MYSQL_DATABASE=petclinic \
-		$(db_name)
+		$(DB_NAME)
 
-# db-run:
-# 	docker run --name mysql-petclinic -e MYSQL_ROOT_PASSWORD=petclinic -e MYSQL_DATABASE=petclinic -p 3307:3306 mysql:5.7.8
+app-build:
+	docker build \
+		-f docker/app.Dockerfile \
+		-t $(OWNER_SERVER_NAME) .
+
+app-run:
+	docker run -d --rm \
+		--name=spring-petclinic-owner \
+		-h localhost \
+		--link=mysql-petclinic-owner \
+		-p 9966:9966 \
+		$(OWNER_SERVER_NAME)
 
 run:
 	./mvnw spring-boot:run
