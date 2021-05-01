@@ -17,6 +17,14 @@
 package org.springframework.samples.petclinic.rest;
 
 import java.util.Collection;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Iterator;
+import java.util.Date;
+
+import java.text.SimpleDateFormat;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -27,6 +35,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.model.Owner;
+import org.springframework.samples.petclinic.model.Pet;
+import org.springframework.samples.petclinic.model.Visit;
 import org.springframework.samples.petclinic.service.ClinicService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -136,6 +146,69 @@ public class OwnerRestController {
 		}
 		this.clinicService.deleteOwner(owner);
 		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+	}
+
+	@PreAuthorize( "hasRole(@roles.OWNER_ADMIN)" )
+	@RequestMapping(value = "/appointments/{ownerId}/{date}", method = RequestMethod.GET, produces = "application/json")
+	public ResponseEntity<Collection<Visit>> getAppointmentByDate(@PathVariable("ownerId") int ownerId, @PathVariable("date") String date) {
+		Owner owner = null;
+		owner = this.clinicService.findOwnerById(ownerId);
+		if (owner == null) {
+			return new ResponseEntity<Collection<Visit>>(HttpStatus.NOT_FOUND);
+		}
+		date += " 08:00:00";
+		Date targetDate = null;
+		try {
+			targetDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
+		} catch (Exception e) {
+			return new ResponseEntity<Collection<Visit>>(HttpStatus.NOT_FOUND);
+		}
+
+		List<Pet> pets = owner.getPets();
+		Collection<Visit> visits = new ArrayList<Visit>();
+		
+		for(int i = 0; i < pets.size(); i++){
+			for(int j = 0; j < pets.get(i).getVisits().size(); j++){
+				Visit visit = pets.get(i).getVisits().get(j);
+				if (visit.getDate().after(targetDate)){
+					visits.add(visit);
+				}
+			}
+		}
+		return new ResponseEntity<Collection<Visit>>(visits, HttpStatus.OK);
+	}
+
+	@PreAuthorize( "hasRole(@roles.VET_ADMIN)" )
+	@RequestMapping(value = "/appointments/{date}", method = RequestMethod.GET, produces = "application/json")
+	public ResponseEntity<Collection<Visit>> getAllAppointmentByDate(@PathVariable("date") String date) {
+		Collection<Owner> owners = new ArrayList<Owner>();
+		owners = this.clinicService.findAllOwners();
+		if (owners.isEmpty()) {
+			return new ResponseEntity<Collection<Visit>>(HttpStatus.NOT_FOUND);
+		}
+		date += " 08:00:00";
+		Date targetDate = null;
+		try {
+			targetDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
+		} catch (Exception e) {
+			return new ResponseEntity<Collection<Visit>>(HttpStatus.NOT_FOUND);
+		}
+
+		List<Pet> pets = new ArrayList<Pet>();
+		for (Owner owner : owners) {
+			pets.addAll(owner.getPets());
+		}
+
+		Collection<Visit> visits = new ArrayList<Visit>();
+		for(int i = 0; i < pets.size(); i++){
+			for(int j = 0; j < pets.get(i).getVisits().size(); j++){
+				Visit visit = pets.get(i).getVisits().get(j);
+				if (visit.getDate().after(targetDate)){
+					visits.add(visit);
+				}
+			}
+		}
+		return new ResponseEntity<Collection<Visit>>(visits, HttpStatus.OK);
 	}
 
 }

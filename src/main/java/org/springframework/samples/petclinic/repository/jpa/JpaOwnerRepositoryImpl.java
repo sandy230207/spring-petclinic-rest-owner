@@ -91,6 +91,6 @@ public class JpaOwnerRepositoryImpl implements OwnerRepository {
 	@Override
 	public void delete(Owner owner) throws DataAccessException {
 		this.em.remove(this.em.contains(owner) ? owner : this.em.merge(owner));
-	}
+    }
 
 }

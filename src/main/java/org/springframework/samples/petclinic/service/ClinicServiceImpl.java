@@ -206,7 +206,15 @@ public class ClinicServiceImpl implements ClinicService {
 		return visitRepository.findByPetId(petId);
 	}
 	
-	
+	// @Override
+	// @Transactional(readOnly = true)
+	// public Collection<Visit> findVisitByOwnerId(int ownerId){
+	// 	return visitRepository.findByOwnerId(ownerId);
+	// }
 
-
+	// @Override
+	// @Transactional
+	// public void deleteVisitByPetId(int petId) throws DataAccessException {
+	// 	visitRepository.deleteByPetId(petId);
+	// }
 }

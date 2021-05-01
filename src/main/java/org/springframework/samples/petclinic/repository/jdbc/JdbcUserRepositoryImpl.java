@@ -65,4 +65,19 @@ public class JdbcUserRepositoryImpl implements UserRepository {
             }
         }
     }
+
+    @Override
+	public User findByUsername(String username) throws DataAccessException {
+		Map<String, Object> params = new HashMap<>();
+        params.put("username", username);
+        return this.namedParameterJdbcTemplate.queryForObject("SELECT * FROM users WHERE username=:username",
+            params, BeanPropertyRowMapper.newInstance(User.class));
+    }
+    
+    @Override
+	public void delete(User user) throws DataAccessException {
+		Map<String, Object> params = new HashMap<>();
+		params.put("username", user.getUsername());
+		this.namedParameterJdbcTemplate.update("DELETE FROM users WHERE username=:username", params);
+	}
 }

@@ -121,4 +121,27 @@ public class VisitRestController {
 		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
 	}
 
+	// @PreAuthorize( "hasRole(@roles.OWNER_ADMIN)" )
+	// @RequestMapping(value = "/owner/{ownerId}", method = RequestMethod.GET, produces = "application/json")
+	// public ResponseEntity<Collection<Visit>> getVisitByOwnerId(@PathVariable("ownerId") int ownerId){
+	// 	Collection<Visit> visits = new ArrayList<Visit>();
+	// 	visits.addAll(this.clinicService.findVisitByOwnerId(ownerId));
+	// 	if (visits.isEmpty()){
+	// 		return new ResponseEntity<Collection<Visit>>(HttpStatus.NOT_FOUND);
+	// 	}
+	// 	return new ResponseEntity<Collection<Visit>>(visits, HttpStatus.OK);
+	// }
+
+	// @PreAuthorize( "hasRole(@roles.OWNER_ADMIN)" )
+	// @RequestMapping(value = "/pet/{petId}", method = RequestMethod.DELETE, produces = "application/json")
+	// @Transactional
+	// public ResponseEntity<Void> deleteVisitByPetId(@PathVariable("petId") int petId){
+	// 	Visit visit = this.clinicService.findVisitByPetId(petId);
+	// 	if(visit == null){
+	// 		return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+	// 	}
+	// 	this.clinicService.deleteVisitByPetId(petId);
+	// 	return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+	// }
+
 }

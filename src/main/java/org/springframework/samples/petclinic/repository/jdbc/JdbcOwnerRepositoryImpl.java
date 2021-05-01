@@ -191,7 +191,6 @@ public class JdbcOwnerRepositoryImpl implements OwnerRepository {
             this.namedParameterJdbcTemplate.update("DELETE FROM pets WHERE id=:id", pet_params);
         }
         this.namedParameterJdbcTemplate.update("DELETE FROM owners WHERE id=:id", owner_params);
-	}
-
+    }
 
 }

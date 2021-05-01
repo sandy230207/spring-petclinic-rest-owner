@@ -93,6 +93,7 @@ public class Owner extends Person {
     public void setTelephone(String telephone) {
         this.telephone = telephone;
     }
+    
     @JsonIgnore
     protected Set<Pet> getPetsInternal() {
         if (this.pets == null) {
@@ -108,7 +109,9 @@ public class Owner extends Person {
     public List<Pet> getPets() {
         List<Pet> sortedPets = new ArrayList<>(getPetsInternal());
         PropertyComparator.sort(sortedPets, new MutableSortDefinition("name", true, true));
-        return Collections.unmodifiableList(sortedPets);
+        // return Collections.unmodifiableList(sortedPets);
+        return sortedPets;
+
     }
 
     public void addPet(Pet pet) {

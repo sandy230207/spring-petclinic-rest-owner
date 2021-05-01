@@ -48,6 +48,10 @@ public interface VisitRepository {
 	
 	Collection<Visit> findAll() throws DataAccessException;
 
-	void delete(Visit visit) throws DataAccessException;
+    void delete(Visit visit) throws DataAccessException;
+    
+    // Collection<Visit> findByOwnerId(Integer ownerId);
+
+    // void deleteByPetId(int petId) throws DataAccessException;
 
 }

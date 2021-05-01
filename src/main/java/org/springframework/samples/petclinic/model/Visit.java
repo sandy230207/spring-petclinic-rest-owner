@@ -69,6 +69,11 @@ public class Visit extends BaseEntity {
     private Pet pet;
 
 
+    // @ManyToOne
+    // @JoinColumn(name = "owner_id")
+    // private Owner owner;
+
+
     /**
      * Creates a new instance of Visit for the current date
      */
@@ -130,5 +135,23 @@ public class Visit extends BaseEntity {
     public void setPet(Pet pet) {
         this.pet = pet;
     }
+
+    // /**
+    //  * Getter for property owner.
+    //  *
+    //  * @return Value of property owner.
+    //  */
+    // public Owner getOwner() {
+    //     return this.owner;
+    // }
+
+    // /**
+    //  * Setter for property owner.
+    //  *
+    //  * @param owner New value of property owner.
+    //  */
+    // public void setOwner(Owner owner) {
+    //     this.owner = owner;
+    // }
 
 }

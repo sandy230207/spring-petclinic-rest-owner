@@ -24,4 +24,14 @@ public class JpaUserRepositoryImpl implements UserRepository {
             this.em.merge(user);
         }
     }
+
+    @Override
+	public User findByUsername(String username) throws DataAccessException {
+		return this.em.find(User.class, username);
+    }
+    
+    @Override
+	public void delete(User user) throws DataAccessException {
+		this.em.remove(this.em.contains(user) ? user : this.em.merge(user));
+	}
 }

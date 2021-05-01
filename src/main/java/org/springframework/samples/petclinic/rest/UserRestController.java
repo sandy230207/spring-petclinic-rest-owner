@@ -17,6 +17,7 @@
 package org.springframework.samples.petclinic.rest;
 
 import javax.validation.Valid;
+import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -32,6 +33,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
+
+
 
 @RestController
 @CrossOrigin(exposedHeaders = "errors, content-type")
@@ -42,8 +46,8 @@ public class UserRestController {
     private UserService userService;
 
     @PreAuthorize( "hasRole(@roles.ADMIN)" )
-    @RequestMapping(value = "", method = RequestMethod.POST, produces = "application/json")
-    public ResponseEntity<User> addOwner(@RequestBody @Valid User user,  BindingResult bindingResult) throws Exception {
+    @RequestMapping(value = "/signUp", method = RequestMethod.POST, produces = "application/json")
+    public ResponseEntity<User> signUp(@RequestBody @Valid User user,  BindingResult bindingResult) throws Exception {
         BindingErrorsResponse errors = new BindingErrorsResponse();
         HttpHeaders headers = new HttpHeaders();
         if (bindingResult.hasErrors() || (user == null)) {
@@ -55,4 +59,38 @@ public class UserRestController {
         this.userService.saveUser(user);
         return new ResponseEntity<User>(user, headers, HttpStatus.CREATED);
     }
+
+    @PreAuthorize( "hasRole(@roles.ADMIN)" )
+    @RequestMapping(value = "/signIn", method = RequestMethod.POST, produces = "application/json")
+	public ResponseEntity<User> signIn(@RequestBody @Valid User user,  BindingResult bindingResult) throws Exception {
+        BindingErrorsResponse errors = new BindingErrorsResponse();
+        HttpHeaders headers = new HttpHeaders();
+        if (bindingResult.hasErrors() || (user == null)) {
+            errors.addAllErrors(bindingResult);
+            headers.add("errors", errors.toJSON());
+            return new ResponseEntity<User>(user, headers, HttpStatus.BAD_REQUEST);
+        }
+        User queryUserResult = this.userService.findUserByUsername(user.getUsername());
+		if(queryUserResult == null){
+			return new ResponseEntity<User>(HttpStatus.FORBIDDEN);
+        }
+        if (!user.getPassword().equals(queryUserResult.getPassword())){
+            return new ResponseEntity<User>(HttpStatus.FORBIDDEN);
+        }
+        queryUserResult.setPassword("");
+        // queryUserResult.setRoles(roles);
+        return new ResponseEntity<User>(queryUserResult, headers, HttpStatus.OK);    
+    }
+
+    @PreAuthorize( "hasRole(@roles.VET_ADMIN)" )
+	@RequestMapping(value = "/{username}", method = RequestMethod.DELETE, produces = "application/json")
+	@Transactional
+	public ResponseEntity<Void> deleteUser(@PathVariable("username") String username){
+		User user = this.userService.findUserByUsername(username);
+		if(user == null){
+			return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+		}
+		this.userService.deleteUser(user);
+		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+	}
 }

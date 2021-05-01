@@ -6,6 +6,11 @@ import org.springframework.samples.petclinic.model.Role;
 import org.springframework.samples.petclinic.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.orm.ObjectRetrievalFailureException;
+
+
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -33,4 +38,24 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
     }
+
+    @Override
+	@Transactional(readOnly = true)
+	public User findUserByUsername(String username) throws DataAccessException {
+		User user = null;
+		try {
+			user = userRepository.findByUsername(username);
+		} catch (ObjectRetrievalFailureException|EmptyResultDataAccessException e) {
+		// just ignore not found exceptions for Jdbc/Jpa realization
+			return null;
+        }
+        
+		return user;
+    }
+    
+    @Override
+	@Transactional
+	public void deleteUser(User user) throws DataAccessException {
+		userRepository.delete(user);
+	}
 }

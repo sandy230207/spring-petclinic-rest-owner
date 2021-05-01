@@ -145,6 +145,15 @@ public class JdbcVisitRepositoryImpl implements VisitRepository {
 		this.namedParameterJdbcTemplate.update("DELETE FROM visits WHERE id=:id", params);
 	}
 
+	// @Override
+    // public Collection<Visit> findByOwnerId(Integer ownerId) {
+	// 	Map<String, Object> params = new HashMap<>();
+	// 	params.put("ownerId", ownerId);
+	// 	return this.namedParameterJdbcTemplate.query(
+	// 			"SELECT id as visit_id, visit_date, description FROM visits WHERE pet_id IN (SELECT id FROM pets WHERE pets.owner_id=:ownerId)",
+	// 			params, new JdbcVisitRowMapperExt());
+    // }
+
 	protected class JdbcVisitRowMapperExt implements RowMapper<Visit> {
 
 		@Override
@@ -179,5 +188,6 @@ public class JdbcVisitRepositoryImpl implements VisitRepository {
 			return visit;
 		}
 	}
+
 
 }

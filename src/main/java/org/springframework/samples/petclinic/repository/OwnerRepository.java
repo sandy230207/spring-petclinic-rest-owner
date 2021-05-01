@@ -75,7 +75,6 @@ public interface OwnerRepository {
      * @param owner the <code>Owner</code> to delete
      * 
      */
-	void delete(Owner owner) throws DataAccessException;
-
+    void delete(Owner owner) throws DataAccessException;
 
 }
