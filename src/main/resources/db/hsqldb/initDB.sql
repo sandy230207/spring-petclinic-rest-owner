@@ -1,3 +1,5 @@
+DROP TABLE roles IF EXISTS;
+DROP TABLE users IF EXISTS;
 DROP TABLE vet_specialties IF EXISTS;
 DROP TABLE vets IF EXISTS;
 DROP TABLE specialties IF EXISTS;
@@ -5,8 +7,6 @@ DROP TABLE visits IF EXISTS;
 DROP TABLE pets IF EXISTS;
 DROP TABLE types IF EXISTS;
 DROP TABLE owners IF EXISTS;
-DROP TABLE roles IF EXISTS;
-DROP TABLE users IF EXISTS;
 
 
 CREATE TABLE vets (
@@ -58,7 +58,7 @@ CREATE INDEX pets_name ON pets (name);
 
 CREATE TABLE visits (
   id          INTEGER IDENTITY PRIMARY KEY,
-  pet_id      INTEGER NOT NULL,
+  pet_id      INTEGER,
   visit_date  DATE,
   description VARCHAR(255)
 );
@@ -69,8 +69,10 @@ CREATE  TABLE users (
   username    VARCHAR(20) NOT NULL ,
   password    VARCHAR(20) NOT NULL ,
   enabled     BOOLEAN DEFAULT TRUE NOT NULL ,
+  uid INTEGER NOT NULL ,
   PRIMARY KEY (username)
 );
+
 
 CREATE TABLE roles (
   id              INTEGER IDENTITY PRIMARY KEY,

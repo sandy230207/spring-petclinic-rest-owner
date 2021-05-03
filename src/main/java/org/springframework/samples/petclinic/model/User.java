@@ -9,7 +9,9 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.JoinColumn;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -26,6 +28,13 @@ public class User {
 
     @Column(name = "enabled")
     private Boolean enabled;
+
+    @Column(name = "uid")
+    private Integer uid;
+
+    // @OneToOne(cascade = CascadeType.ALL)
+    // @JoinColumn(name="uid", referencedColumnName="id")
+    // private Owner owner;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.EAGER)
     private Set<Role> roles;
@@ -54,6 +63,14 @@ public class User {
         this.enabled = enabled;
     }
 
+    public Integer getUid() {
+        return uid;
+    }
+
+    public void setUid(Integer uid) {
+        this.uid = uid;
+    }
+
     public Set<Role> getRoles() {
         return roles;
     }
@@ -71,4 +88,12 @@ public class User {
         role.setName(roleName);
         this.roles.add(role);
     }
+
+    // public Owner getOwner() {
+    //     return owner;
+    // }
+
+    // public void setOwner(Owner owner) {
+    //     this.owner = owner;
+    // }
 }

@@ -50,6 +50,7 @@ public class UserRestControllerTests {
         user.setUsername("username");
         user.setPassword("password");
         user.setEnabled(true);
+        user.setUid(2);
         user.addRole( "OWNER_ADMIN" );
         ObjectMapper mapper = new ObjectMapper();
         String newVetAsJSON = mapper.writeValueAsString(user);
@@ -65,6 +66,7 @@ public class UserRestControllerTests {
         user.setUsername("username");
         user.setPassword("password");
         user.setEnabled(true);
+        user.setUid(2);
         ObjectMapper mapper = new ObjectMapper();
         String newVetAsJSON = mapper.writeValueAsString(user);
         this.mockMvc.perform(post("/api/users/signUp")

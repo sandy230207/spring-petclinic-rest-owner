@@ -26,9 +26,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotEmpty;
+import javax.persistence.JoinColumn;
 
 import org.springframework.beans.support.MutableSortDefinition;
 import org.springframework.beans.support.PropertyComparator;
@@ -65,6 +67,10 @@ public class Owner extends Person {
     @NotEmpty
     @Digits(fraction = 0, integer = 10)
     private String telephone;
+
+    // @OneToOne(cascade = CascadeType.ALL)
+    // @JoinColumn(name="id", referencedColumnName="uid")
+    // private User user;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner", fetch = FetchType.EAGER)
     private Set<Pet> pets;
@@ -162,4 +168,12 @@ public class Owner extends Person {
             .append("telephone", this.telephone)
             .toString();
     }
+
+    // public User getUser() {
+    //     return user;
+    // }
+
+    // public void setUser(User user) {
+    //     this.user = user;
+    // }
 }

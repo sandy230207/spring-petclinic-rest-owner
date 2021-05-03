@@ -27,6 +27,7 @@ public abstract class AbstractUserServiceTests {
         user.setUsername("username");
         user.setPassword("password");
         user.setEnabled(true);
+        user.setUid(2);
         user.addRole("OWNER_ADMIN");
 
         userService.saveUser(user);

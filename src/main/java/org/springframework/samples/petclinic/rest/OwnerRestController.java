@@ -17,12 +17,15 @@
 package org.springframework.samples.petclinic.rest;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Iterator;
 import java.util.Date;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 import java.text.SimpleDateFormat;
 
@@ -151,16 +154,21 @@ public class OwnerRestController {
 	@PreAuthorize( "hasRole(@roles.OWNER_ADMIN)" )
 	@RequestMapping(value = "/appointments/{ownerId}/{date}", method = RequestMethod.GET, produces = "application/json")
 	public ResponseEntity<Collection<Visit>> getAppointmentByDate(@PathVariable("ownerId") int ownerId, @PathVariable("date") String date) {
+		Date targetDate = null;
+		if (date.equals("now")){
+			targetDate = new Date();
+		} else {
+			date += " 08:00:00";
+			try {
+				targetDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
+			} catch (Exception e) {
+				return new ResponseEntity<Collection<Visit>>(HttpStatus.NOT_FOUND);
+			}
+		}
+		
 		Owner owner = null;
 		owner = this.clinicService.findOwnerById(ownerId);
 		if (owner == null) {
-			return new ResponseEntity<Collection<Visit>>(HttpStatus.NOT_FOUND);
-		}
-		date += " 08:00:00";
-		Date targetDate = null;
-		try {
-			targetDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
-		} catch (Exception e) {
 			return new ResponseEntity<Collection<Visit>>(HttpStatus.NOT_FOUND);
 		}
 
@@ -175,22 +183,40 @@ public class OwnerRestController {
 				}
 			}
 		}
+		if (visits.isEmpty()) {
+			return new ResponseEntity<Collection<Visit>>(HttpStatus.NOT_FOUND);
+		}
+
+		List<Visit> visitList = new ArrayList<Visit>();
+		visitList.addAll(visits);
+
+		visitList = visitList.stream()
+        .sorted(Comparator.comparing(Visit::getDate))
+		.collect(Collectors.toList());
+		
+		visits = new ArrayList<Visit>();
+		visits.addAll(visitList);
 		return new ResponseEntity<Collection<Visit>>(visits, HttpStatus.OK);
 	}
 
 	@PreAuthorize( "hasRole(@roles.VET_ADMIN)" )
 	@RequestMapping(value = "/appointments/{date}", method = RequestMethod.GET, produces = "application/json")
 	public ResponseEntity<Collection<Visit>> getAllAppointmentByDate(@PathVariable("date") String date) {
+		Date targetDate = null;
+		if (date.equals("now")){
+			targetDate = new Date();
+		} else {
+			date += " 08:00:00";
+			try {
+				targetDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
+			} catch (Exception e) {
+				return new ResponseEntity<Collection<Visit>>(HttpStatus.NOT_FOUND);
+			}
+		}
+
 		Collection<Owner> owners = new ArrayList<Owner>();
 		owners = this.clinicService.findAllOwners();
 		if (owners.isEmpty()) {
-			return new ResponseEntity<Collection<Visit>>(HttpStatus.NOT_FOUND);
-		}
-		date += " 08:00:00";
-		Date targetDate = null;
-		try {
-			targetDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date);
-		} catch (Exception e) {
 			return new ResponseEntity<Collection<Visit>>(HttpStatus.NOT_FOUND);
 		}
 
@@ -208,6 +234,20 @@ public class OwnerRestController {
 				}
 			}
 		}
+		if (visits.isEmpty()) {
+			return new ResponseEntity<Collection<Visit>>(HttpStatus.NOT_FOUND);
+		}
+
+		List<Visit> visitList = new ArrayList<Visit>();
+		visitList.addAll(visits);
+
+		visitList = visitList.stream()
+        .sorted(Comparator.comparing(Visit::getDate))
+		.collect(Collectors.toList());
+		
+		visits = new ArrayList<Visit>();
+		visits.addAll(visitList);
+		
 		return new ResponseEntity<Collection<Visit>>(visits, HttpStatus.OK);
 	}
 
