@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,6 +47,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.web.servlet.MvcResult;
+
+import java.text.SimpleDateFormat;
+
+
+// import jdk.jfr.Timestamp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -71,12 +78,15 @@ public class OwnerRestControllerTests {
 
     private List<Owner> owners;
 
+    private List<Visit> appointments;
+
     @Before
     public void initOwners(){
     	this.mockMvc = MockMvcBuilders.standaloneSetup(ownerRestController)
     			.setControllerAdvice(new ExceptionControllerAdvice())
     			.build();
     	owners = new ArrayList<Owner>();
+        appointments = new ArrayList<Visit>();
 
     	Owner ownerWithPet = new Owner();
     	ownerWithPet.setId(1);
@@ -126,15 +136,23 @@ public class OwnerRestControllerTests {
         pet.setBirthDate(new Date());
         pet.setOwner(owner);
         pet.setType(petType);
-        pet.addVisit(getTestVisitForPet(pet, 1));
+        pet.addVisit(getTestVisitForPet(pet, 1, "2020-04-10"));
+        pet.addVisit(getTestVisitForPet(pet, 2, "2020-07-02"));
+        pet.addVisit(getTestVisitForPet(pet, 3, "2020-07-10"));
         return pet;
     }
 
-    private Visit getTestVisitForPet(final Pet pet, final int id) {
+    private Visit getTestVisitForPet(final Pet pet, final int id, final String date) {
         Visit visit = new Visit();
+        Date visitDate = null;
+        try {
+            visitDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
+        } catch (Exception e) {
+            return null;
+        }
         visit.setId(id);
         visit.setPet(pet);
-        visit.setDate(new Date());
+        visit.setDate(visitDate);
         visit.setDescription("test" + id);
         return visit;
     }
@@ -363,68 +381,45 @@ public class OwnerRestControllerTests {
         	.andExpect(status().isNotFound());
     }
 
-    // @Test
-    // @WithMockUser(roles="OWNER_ADMIN")
-    // public void testGetAllOwnersSuccess() throws Exception {
-    // 	owners.remove(0);
-    // 	owners.remove(1);
-    // 	given(this.clinicService.findAllOwners()).willReturn(owners);
-    //     this.mockMvc.perform(get("/api/owners/")
-    //     	.accept(MediaType.APPLICATION_JSON))
-    //         .andExpect(status().isOk())
-    //         .andExpect(content().contentType("application/json"))
-    //         .andExpect(jsonPath("$.[0].id").value(2))
-    //         .andExpect(jsonPath("$.[0].firstName").value("Betty"))
-    //         .andExpect(jsonPath("$.[1].id").value(4))
-    //         .andExpect(jsonPath("$.[1].firstName").value("Harold"));
-    // }
+    @Test
+    @WithMockUser(roles="OWNER_ADMIN")
+    public void testGetAppointmentByDateSuccess() throws Exception {
+        given(this.clinicService.findOwnerById(1)).willReturn(owners.get(0));
+        System.out.println(this.clinicService.findOwnerById(1));
+        System.out.println(owners.get(0));
+        this.mockMvc.perform(get("/api/owners/appointments/1/2020-07-01")
+        	.accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType("application/json"))
+        	.andExpect(jsonPath("$.[0].id").value(2))
+        	.andExpect(jsonPath("$.[0].description").value("test2"))
+            .andExpect(jsonPath("$.[1].id").value(3))
+        	.andExpect(jsonPath("$.[1].description").value("test3"));
+    }
 
-    // @Test
-    // @WithMockUser(roles="OWNER_ADMIN")
-    // public void testGetAppointmentByDateSuccess() throws Exception {
-    //     System.out.println("jjjjjjjjjjjjjjjjjj"+this.clinicService.findOwnerById(1));
-    //     System.out.println("kkkkkkkkkkkkkkkkkk"+owners.get(0).getPets()[0].getVisits);
+    @Test
+    @WithMockUser(roles="OWNER_ADMIN")
+    public void testGetAppointmentByDateError() throws Exception {
+        appointments.clear();
+        given(this.clinicService.findOwnerById(-1)).willReturn(null);
+        this.mockMvc.perform(get("/api/owners/appointments/-1/2019-01-02")
+        	.accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound());
+    }
 
-    //     given(this.clinicService.findOwnerById(1)).willReturn(owners.get(0));
-    //     this.mockMvc.perform(get("/api/owners/appointments/1/2020-07-01")
-    //     	.accept(MediaType.APPLICATION_JSON))
-    //         .andExpect(status().isOk())
-    //         .andExpect(content().contentType("application/json"))
-    //     	.andExpect(jsonPath("$.[0].id").value(2))
-    //     	.andExpect(jsonPath("$.[0].description").value("test2"))
-    //         .andExpect(jsonPath("$.[1].id").value(3))
-    //     	.andExpect(jsonPath("$.[1].description").value("test3"));
+    @Test
+    @WithMockUser(roles="OWNER_ADMIN")
+    public void testGetAllAppointmentByDateSuccess() throws Exception {
+        given(this.clinicService.findAllOwners()).willReturn(owners);
+        this.mockMvc.perform(get("/api/owners/appointments/2020-07-01")
+        	.accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType("application/json"))
+        	.andExpect(jsonPath("$.[0].id").value(2))
+        	.andExpect(jsonPath("$.[0].description").value("test2"))
+            .andExpect(jsonPath("$.[1].id").value(3))
+        	.andExpect(jsonPath("$.[1].description").value("test3"));
+    }
 
-    //     System.out.println(owners.get(0));
-
-    // }
-
-    // @Test
-    // @WithMockUser(roles="OWNER_ADMIN")
-    // public void testGetAppointmentByDateError() throws Exception {
-    //     appointments.clear();
-    //     given(this.clinicService.findOwnerById(-1)).willReturn(null);
-    //     this.mockMvc.perform(get("/api/owners/appointments/-1/2019-01-02")
-    //     	.accept(MediaType.APPLICATION_JSON))
-    //         .andExpect(status().isNotFound());
-    // }
-
-
-
-
-    // @Test
-    // @WithMockUser(roles="OWNER_ADMIN")
-    // public void testGetAllAppointmentByDateSuccess() throws Exception {
-    //     given(this.clinicService.findAllOwners()).willReturn(owners);
-    //     this.mockMvc.perform(get("/api/owners/appointments/2020-07-01")
-    //     	.accept(MediaType.APPLICATION_JSON))
-    //         .andExpect(status().isOk())
-    //         .andExpect(content().contentType("application/json"))
-    //     	.andExpect(jsonPath("$.[0].id").value(2))
-    //     	.andExpect(jsonPath("$.[0].description").value("test2"))
-    //         .andExpect(jsonPath("$.[1].id").value(3))
-    //         .andExpect(jsonPath("$.[1].description").value("test3"));
-        
-    // }
 
 }
