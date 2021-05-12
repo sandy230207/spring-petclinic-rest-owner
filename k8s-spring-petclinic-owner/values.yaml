@@ -6,8 +6,10 @@ replicaCount: 1
 
 image:
   repository: sandy230207/spring-petclinic-rest-owner
+  # repository: a123453906/spring-petclinic-rest-owner
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
+  # tag: "latest"
   tag: "v1"
 
 imagePullSecrets: []
@@ -44,16 +46,15 @@ service:
 
 ingress:
   enabled: true
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  # annotations:
+  #   kubernetes.io/ingress.class: nginx
   hosts:
     - host: chart-example.local
+    # - host: percom-petclinic-owner.souhire.cf
       paths: ["/"]
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  # tls:
+  #  - hosts:
+  #      - percom-petclinic-owner.souhire.cf
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -82,6 +83,6 @@ affinity: {}
 
 env:
   - name: MYSQL_HOST
-    value: 10.108.86.29
+    value: mysql-petclinic-k8s-mysql-petclinic
   - name: MYSQL_PASSWORD
     value: petclinic
