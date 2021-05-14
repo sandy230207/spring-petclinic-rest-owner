@@ -1,4 +1,5 @@
 OWNER_SERVER_NAME = "sandy230207/spring-petclinic-rest-owner:v1"
+# OWNER_SERVER_NAME = "a123453906/spring-petclinic-rest-owner:latest"
 
 app-build:
 	docker build \
