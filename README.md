@@ -1,15 +1,21 @@
 # spring-petclinic-rest-owner
+
+## Prerequisite
+Build and run the [docker image/container for MySQL database](https://github.com/sandy230207/mysql-petclinic)
+
 ## Start API server
 Make sure you are in the root directory of the project ( the directory would be like `*/spring-petclinic-rest-owner` )
-1. Build the docker image for MySQL database if you **never build** it.
-    ```sh
-    make db-build
-    ```
-2. Run MySQL container
-    ```sh
-    make db-run
-    ```
-3. Start API server
-    ```sh
-    make run
-    ```
+
+Export environment variable
+```sh
+export MYSQL_PASSWORD=petclinic
+export export MYSQL_HOST=127.0.0.1
+```
+
+Run server
+```sh
+make run
+```
+
+## Kubernetes
+[Document](https://hackmd.io/@NLsj-cc1SqyixEbz3Sh6wA/SJjI98iE_)
