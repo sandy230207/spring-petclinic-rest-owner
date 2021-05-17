@@ -47,12 +47,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.test.web.servlet.MvcResult;
-
-import java.text.SimpleDateFormat;
-
-
-// import jdk.jfr.Timestamp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -136,23 +130,17 @@ public class OwnerRestControllerTests {
         pet.setBirthDate(new Date());
         pet.setOwner(owner);
         pet.setType(petType);
-        pet.addVisit(getTestVisitForPet(pet, 1, "2020-04-10"));
-        pet.addVisit(getTestVisitForPet(pet, 2, "2020-07-02"));
-        pet.addVisit(getTestVisitForPet(pet, 3, "2020-07-10"));
+        pet.addVisit(getTestVisitForPet(pet, 1, 120, 04, 10));
+        pet.addVisit(getTestVisitForPet(pet, 2, 120, 07, 02));
+        pet.addVisit(getTestVisitForPet(pet, 3, 120, 07, 10));
         return pet;
     }
 
-    private Visit getTestVisitForPet(final Pet pet, final int id, final String date) {
+    private Visit getTestVisitForPet(final Pet pet, final int id, final int year, final int month, final int day) {
         Visit visit = new Visit();
-        Date visitDate = null;
-        try {
-            visitDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
-        } catch (Exception e) {
-            return null;
-        }
         visit.setId(id);
         visit.setPet(pet);
-        visit.setDate(visitDate);
+        visit.setDate(new Date(year, month, day));
         visit.setDescription("test" + id);
         return visit;
     }
@@ -385,8 +373,6 @@ public class OwnerRestControllerTests {
     @WithMockUser(roles="OWNER_ADMIN")
     public void testGetAppointmentByDateSuccess() throws Exception {
         given(this.clinicService.findOwnerById(1)).willReturn(owners.get(0));
-        System.out.println(this.clinicService.findOwnerById(1));
-        System.out.println(owners.get(0));
         this.mockMvc.perform(get("/api/owners/appointments/1/2020-07-01")
         	.accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -399,10 +385,20 @@ public class OwnerRestControllerTests {
 
     @Test
     @WithMockUser(roles="OWNER_ADMIN")
-    public void testGetAppointmentByDateError() throws Exception {
+    public void testGetAppointmentByDateNoSuchOwnerError() throws Exception {
         appointments.clear();
         given(this.clinicService.findOwnerById(-1)).willReturn(null);
-        this.mockMvc.perform(get("/api/owners/appointments/-1/2019-01-02")
+        this.mockMvc.perform(get("/api/owners/appointments/-1/2020-07-01")
+        	.accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(roles="OWNER_ADMIN")
+    public void testGetAppointmentByDateEmptyError() throws Exception {
+        appointments.clear();
+        given(this.clinicService.findOwnerById(2)).willReturn(owners.get(1));
+        this.mockMvc.perform(get("/api/owners/appointments/2/2020-07-01")
         	.accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound());
     }
@@ -419,6 +415,16 @@ public class OwnerRestControllerTests {
         	.andExpect(jsonPath("$.[0].description").value("test2"))
             .andExpect(jsonPath("$.[1].id").value(3))
         	.andExpect(jsonPath("$.[1].description").value("test3"));
+    }
+
+    @Test
+    @WithMockUser(roles="OWNER_ADMIN")
+    public void testGetAllAppointmentByDateEmptyError() throws Exception {
+        appointments.clear();
+        given(this.clinicService.findAllOwners()).willReturn(owners);
+        this.mockMvc.perform(get("/api/owners/appointments/2025-07-01")
+        	.accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound());
     }
 
 
