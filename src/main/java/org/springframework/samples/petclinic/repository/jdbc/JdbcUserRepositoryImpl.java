@@ -35,7 +35,6 @@ public class JdbcUserRepositoryImpl implements UserRepository {
     public void save(User user) throws DataAccessException {
 
         BeanPropertySqlParameterSource parameterSource = new BeanPropertySqlParameterSource(user);
-        System.out.println("test 2!!!");
         try {
             getByUsername(user.getUsername());
             this.namedParameterJdbcTemplate.update("UPDATE users SET password=:password, enabled=:enabled, uid=:uid WHERE username=:username", parameterSource);

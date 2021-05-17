@@ -32,10 +32,6 @@ public class User {
     @Column(name = "uid")
     private Integer uid;
 
-    // @OneToOne(cascade = CascadeType.ALL)
-    // @JoinColumn(name="uid", referencedColumnName="id")
-    // private Owner owner;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.EAGER)
     private Set<Role> roles;
 

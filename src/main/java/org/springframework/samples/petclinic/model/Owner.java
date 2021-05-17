@@ -68,10 +68,6 @@ public class Owner extends Person {
     @Digits(fraction = 0, integer = 10)
     private String telephone;
 
-    // @OneToOne(cascade = CascadeType.ALL)
-    // @JoinColumn(name="id", referencedColumnName="uid")
-    // private User user;
-
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "owner", fetch = FetchType.EAGER)
     private Set<Pet> pets;
 
