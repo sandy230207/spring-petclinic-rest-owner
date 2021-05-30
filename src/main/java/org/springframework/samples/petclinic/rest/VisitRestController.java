@@ -22,6 +22,8 @@ import java.util.Collection;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -83,6 +85,13 @@ public class VisitRestController {
 			headers.add("errors", errors.toJSON());
 			return new ResponseEntity<Visit>(headers, HttpStatus.BAD_REQUEST);
 		}
+		Date currentDate = null;
+		currentDate = new Date();
+		if (visit.getDate().before(currentDate)){
+			errors.addAllErrors(bindingResult);
+			headers.add("errors", errors.toJSON());
+			return new ResponseEntity<Visit>(headers, HttpStatus.BAD_REQUEST);
+		}
 		this.clinicService.saveVisit(visit);
 		headers.setLocation(ucBuilder.path("/api/visits/{id}").buildAndExpand(visit.getId()).toUri());
 		return new ResponseEntity<Visit>(visit, headers, HttpStatus.CREATED);
@@ -102,6 +111,13 @@ public class VisitRestController {
 		if(currentVisit == null){
 			return new ResponseEntity<Visit>(HttpStatus.NOT_FOUND);
 		}
+		Date currentDate = null;
+		currentDate = new Date();
+		if (visit.getDate().before(currentDate) || currentVisit.getDate().before(currentDate)){
+			errors.addAllErrors(bindingResult);
+			headers.add("errors", errors.toJSON());
+			return new ResponseEntity<Visit>(headers, HttpStatus.BAD_REQUEST);
+		}
 		currentVisit.setDate(visit.getDate());
 		currentVisit.setDescription(visit.getDescription());
 		currentVisit.setPet(visit.getPet());
@@ -117,31 +133,13 @@ public class VisitRestController {
 		if(visit == null){
 			return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
 		}
+		Date currentDate = null;
+		currentDate = new Date();
+		if (visit.getDate().before(currentDate)){
+			return new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
+		}
 		this.clinicService.deleteVisit(visit);
 		return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
 	}
-
-	// @PreAuthorize( "hasRole(@roles.OWNER_ADMIN)" )
-	// @RequestMapping(value = "/owner/{ownerId}", method = RequestMethod.GET, produces = "application/json")
-	// public ResponseEntity<Collection<Visit>> getVisitByOwnerId(@PathVariable("ownerId") int ownerId){
-	// 	Collection<Visit> visits = new ArrayList<Visit>();
-	// 	visits.addAll(this.clinicService.findVisitByOwnerId(ownerId));
-	// 	if (visits.isEmpty()){
-	// 		return new ResponseEntity<Collection<Visit>>(HttpStatus.NOT_FOUND);
-	// 	}
-	// 	return new ResponseEntity<Collection<Visit>>(visits, HttpStatus.OK);
-	// }
-
-	// @PreAuthorize( "hasRole(@roles.OWNER_ADMIN)" )
-	// @RequestMapping(value = "/pet/{petId}", method = RequestMethod.DELETE, produces = "application/json")
-	// @Transactional
-	// public ResponseEntity<Void> deleteVisitByPetId(@PathVariable("petId") int petId){
-	// 	Visit visit = this.clinicService.findVisitByPetId(petId);
-	// 	if(visit == null){
-	// 		return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
-	// 	}
-	// 	this.clinicService.deleteVisitByPetId(petId);
-	// 	return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
-	// }
 
 }

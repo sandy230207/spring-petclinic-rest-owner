@@ -80,18 +80,5 @@ public class JpaVisitRepositoryImpl implements VisitRepository {
 	public void delete(Visit visit) throws DataAccessException {
         this.em.remove(this.em.contains(visit) ? visit : this.em.merge(visit));
     }
-    
-    // @Override
-    // @SuppressWarnings("unchecked")
-    // public Collection<Visit> findByOwnerId(Integer ownerId) {
-    //     Query query = this.em.createQuery("SELECT v FROM Visit v where v.pet.id=(SELECT id FROM pets WHERE pets.owner.id=:ownerId)");
-    //     query.setParameter("ownerId", ownerId);
-    //     return query.getResultList();
-    // }
-
-    // @Override
-	// public void deleteByPetId(int petId) throws DataAccessException {
-    //     this.em.remove(this.em.contains(visit) ? visit : this.em.merge(visit));
-    // }
 
 }
