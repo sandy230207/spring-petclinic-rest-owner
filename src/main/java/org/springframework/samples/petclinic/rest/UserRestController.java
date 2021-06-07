@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 
 
-
 @RestController
 @CrossOrigin(exposedHeaders = "errors, content-type")
 @RequestMapping("api/users")
@@ -48,7 +47,7 @@ public class UserRestController {
     private UserService userService;
 
     @PreAuthorize( "hasRole(@roles.ADMIN)" )
-    @RequestMapping(value = "/signUp", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value = "/signup", method = RequestMethod.POST, produces = "application/json")
     public ResponseEntity<User> signUp(@RequestBody @Valid User user,  BindingResult bindingResult) throws Exception {
         BindingErrorsResponse errors = new BindingErrorsResponse();
         HttpHeaders headers = new HttpHeaders();
@@ -63,7 +62,7 @@ public class UserRestController {
     }
 
     @PreAuthorize( "hasRole(@roles.ADMIN)" )
-    @RequestMapping(value = "/signIn", method = RequestMethod.POST, produces = "application/json")
+    @RequestMapping(value = "/signin", method = RequestMethod.POST, produces = "application/json")
 	public ResponseEntity<User> signIn(@RequestBody @Valid User user,  BindingResult bindingResult) throws Exception {
         BindingErrorsResponse errors = new BindingErrorsResponse();
         HttpHeaders headers = new HttpHeaders();
@@ -74,10 +73,15 @@ public class UserRestController {
         }
         User queryUserResult = this.userService.findUserByUsername(user.getUsername());
 		if(queryUserResult == null){
-			return new ResponseEntity<User>(HttpStatus.FORBIDDEN);
+			return new ResponseEntity<User>(queryUserResult, headers, HttpStatus.NOT_FOUND);
         }
+        System.out.println("username "+user.getUsername());
+        System.out.println("queryUserResultname "+queryUserResult.getUsername());
+        System.out.println("user "+user.getPassword());
+        System.out.println("queryUserResult "+queryUserResult.getPassword());
+
         if (!user.getPassword().equals(queryUserResult.getPassword())){
-            return new ResponseEntity<User>(HttpStatus.FORBIDDEN);
+            return new ResponseEntity<User>(queryUserResult, headers, HttpStatus.FORBIDDEN);
         }
         queryUserResult.setPassword("");
         // queryUserResult.setRoles(roles);
