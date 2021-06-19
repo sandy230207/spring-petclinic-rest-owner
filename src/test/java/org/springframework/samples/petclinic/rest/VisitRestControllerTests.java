@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.text.SimpleDateFormat;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -101,10 +102,17 @@ public class VisitRestControllerTests {
     	pet.setType(petType);
 
 
+		Date targetDate = null;
+		try {
+			targetDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse("2022-06-20 08:00:00");
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+
     	Visit visit = new Visit();
     	visit.setId(2);
     	visit.setPet(pet);
-    	visit.setDate(new Date());
+    	visit.setDate(targetDate);
     	visit.setDescription("rabies shot");
     	visits.add(visit);
 
