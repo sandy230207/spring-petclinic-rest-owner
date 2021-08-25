@@ -5,12 +5,12 @@
 replicaCount: 1
 
 image:
-  repository: sandy230207/spring-petclinic-rest-owner
-  # repository: a123453906/spring-petclinic-rest-owner
+  #repository: sandy230207/spring-petclinic-rest-owner
+  repository: a123453906/spring-petclinic-rest-owner
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  # tag: "latest"
-  tag: "v1"
+  tag: "latest"
+  #tag: "v1"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -56,7 +56,7 @@ ingress:
   #  - hosts:
   #      - percom-petclinic-owner.souhire.cf
 
-resources: {}
+resources:
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -64,15 +64,15 @@ resources: {}
   # limits:
   #   cpu: 100m
   #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
+  requests:
+    cpu: 100m
   #   memory: 128Mi
 
 autoscaling:
   enabled: true
   minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 50
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
   # targetMemoryUtilizationPercentage: 50
 
 nodeSelector: {}
